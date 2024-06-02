@@ -7,5 +7,5 @@ import java.util.Set;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
 
-    Set<Car> findCarsByIdContains(Set<Long> ids);
+    Set<Car> getCarsByIdIsIn(Set<Long> ids);
 }

@@ -25,6 +25,6 @@ public class DealerServiceImpl implements DealerService {
             return;
         }
         dealerRepository.save(DealerMapper.dtoToDealer(dealerDto,
-                ownerRepository.findAllByIdContaining(dealerDto.getOwnersId())));
+                ownerRepository.getOwnersByIdIsIn(dealerDto.getOwnersId())));
     }
 }

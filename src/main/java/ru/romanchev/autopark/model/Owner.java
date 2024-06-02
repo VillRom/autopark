@@ -30,4 +30,5 @@ public class Owner {
 
     @Transient
     private Set<Car> cars;
+    //TODO добавить в Owner поле Dealer. И переделать таблицу owners(добавить ячейку с dealer_id)
 }

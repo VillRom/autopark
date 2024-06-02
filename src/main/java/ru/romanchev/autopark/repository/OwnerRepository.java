@@ -7,5 +7,5 @@ import java.util.Set;
 
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
-    Set<Owner> findAllByIdContaining(Set<Long> ids);
+    Set<Owner> getOwnersByIdIsIn(Set<Long> ids);
 }

@@ -24,6 +24,6 @@ public class OwnerServiceImpl implements OwnerService {
             log.info("Владелец {} уже существует", ownerDto);
             return;
         }
-        ownerRepository.save(OwnerMapper.dtoToOwner(ownerDto, carRepository.findCarsByIdContains(ownerDto.getCarsId())));
+        ownerRepository.save(OwnerMapper.dtoToOwner(ownerDto, carRepository.getCarsByIdIsIn(ownerDto.getCarsId())));
     }
 }
