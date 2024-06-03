@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.romanchev.autopark.mapper.OwnerMapper;
 import ru.romanchev.autopark.model.dto.OwnerDto;
 import ru.romanchev.autopark.repository.CarRepository;
+import ru.romanchev.autopark.repository.DealerRepository;
 import ru.romanchev.autopark.repository.OwnerRepository;
 import ru.romanchev.autopark.service.OwnerService;
 
@@ -17,6 +18,8 @@ public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
 
     private final CarRepository carRepository;
+
+    private final DealerRepository dealerRepository;
 
     @Override
     public void addOwner(OwnerDto ownerDto) {

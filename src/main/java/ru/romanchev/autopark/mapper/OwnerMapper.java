@@ -19,6 +19,7 @@ public class OwnerMapper {
         dto.setFirstName(owner.getFirstName());
         dto.setLastName(owner.getLastName());
         dto.setMiddleName(owner.getMiddleName());
+        dto.setDealer_id(owner.getOwner().getId());
         return dto;
     }
 
