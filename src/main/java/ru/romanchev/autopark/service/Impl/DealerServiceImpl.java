@@ -4,11 +4,11 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.romanchev.autopark.exception.RequestException;
 import ru.romanchev.autopark.mapper.DealerMapper;
 import ru.romanchev.autopark.model.Dealer;
 import ru.romanchev.autopark.model.Owner;
 import ru.romanchev.autopark.model.dto.DealerDto;
-import ru.romanchev.autopark.model.dto.DealerOutputDto;
 import ru.romanchev.autopark.repository.DealerRepository;
 import ru.romanchev.autopark.repository.OwnerRepository;
 import ru.romanchev.autopark.service.DealerService;
@@ -25,17 +25,17 @@ public class DealerServiceImpl implements DealerService {
     private final OwnerRepository ownerRepository;
 
     @Override
-    public void addDealer(DealerDto dealerDto) {
+    public DealerDto addDealer(DealerDto dealerDto) {
         if (dealerRepository.existsById(dealerDto.getId())) {
             log.info("Дилер {} уже существует", dealerDto);
-            return;
+            throw new RequestException("The dealer with id = " + dealerDto.getId() + " already exists");
         }
-        dealerRepository.save(DealerMapper.dtoToDealer(dealerDto,
-                ownerRepository.getOwnersByIdIsIn(dealerDto.getOwnersId())));
+        return DealerMapper.dealerToDto(dealerRepository.save(DealerMapper.dtoToDealer(dealerDto,
+                ownerRepository.getOwnersByIdIsIn(dealerDto.getOwnersId()))));
     }
 
     @Override
-    public void addOwnerToDealer(Long ownerId, Long dealerId) {
+    public DealerDto addOwnerToDealer(Long ownerId, Long dealerId) {
         Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException("Owner with id = " + ownerId + " not found"));
         Dealer dealer = dealerRepository.findById(dealerId).orElseThrow(()
@@ -45,7 +45,7 @@ public class DealerServiceImpl implements DealerService {
         Set<Owner> owners = dealer.getOwners();
         owners.add(owner);
         dealer.setOwners(owners);
-        dealerRepository.save(dealer);
+        return DealerMapper.dealerToDto(dealerRepository.save(dealer));
     }
 
     @Override
@@ -63,12 +63,9 @@ public class DealerServiceImpl implements DealerService {
     }
 
     @Override
-    public DealerOutputDto getDealer(Long dealerId) {
+    public DealerDto getDealer(Long dealerId) {
         Dealer dealer = dealerRepository.findById(dealerId).orElseThrow(() ->
                 new EntityNotFoundException("Dealer with id = " + dealerId + " not found"));
-        DealerOutputDto dealerOutputDto = new DealerOutputDto();
-        dealerOutputDto.setOwners(dealer.getOwners());
-        dealerOutputDto.addCarsFromOwners();
-        return dealerOutputDto;
+        return DealerMapper.dealerToDto(dealer);
     }
 }

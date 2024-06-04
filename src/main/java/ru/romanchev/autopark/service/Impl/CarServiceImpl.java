@@ -22,25 +22,23 @@ public class CarServiceImpl implements CarService {
     private final OwnerRepository ownerRepository;
 
     @Override
-    public void addCar(CarDto car, Long ownerId) {
+    public void addCar(CarDto car) {
         if (carRepository.existsById(car.getId())) {
             log.info("Автомобиль {} уже существует", car);
             return;
         }
-        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() ->
-        new EntityNotFoundException("Owner with id = " + ownerId + " not found"));
-        carRepository.save(CarMapper.dtoToCar(car,owner));
+        carRepository.save(CarMapper.dtoToCar(car));
     }
 
     @Override
-    public void addCarToOwner(Long carId, Long ownerId) {
+    public CarDto addCarToOwner(Long carId, Long ownerId) {
         Car car = carRepository.findById(carId).orElseThrow(()
                 -> new EntityNotFoundException("Car with id = " + carId + " not found"));
         Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException("Owner with id = " + carId + " not found"));
         if (car.getOwner() != null) throw new RuntimeException("У машины уже есть владелец");
         car.setOwner(owner);
-        carRepository.save(car);
+        return CarMapper.carToDto(carRepository.save(car));
     }
 
     @Override
@@ -53,5 +51,12 @@ public class CarServiceImpl implements CarService {
                 "за другим владельцем");
         car.setOwner(null);
         carRepository.save(car);
+    }
+
+    @Override
+    public CarDto getCar(Long carId) {
+        Car car = carRepository.findById(carId).orElseThrow(()
+                -> new EntityNotFoundException("Car with id = " + carId + " not found"));
+        return CarMapper.carToDto(car);
     }
 }

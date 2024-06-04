@@ -2,7 +2,6 @@ package ru.romanchev.autopark.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.romanchev.autopark.model.Car;
-import ru.romanchev.autopark.model.Owner;
 import ru.romanchev.autopark.model.dto.CarDto;
 
 import java.util.Set;
@@ -19,11 +18,10 @@ public class CarMapper {
         return dto;
     }
 
-    public static Car dtoToCar(CarDto dto, Owner owner) {
+    public static Car dtoToCar(CarDto dto) {
         Car car = new Car();
         car.setId(dto.getId());
         car.setNumber(dto.getNumber());
-        car.setOwner(owner);
         car.setBuildDate(dto.getBuildDate());
         return car;
     }
