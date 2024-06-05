@@ -37,6 +37,7 @@ public class NmeaServ {
                     sentences.add(sentence);
                 }
             }
+            System.out.println(sentences.size() + indexForDate.size());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

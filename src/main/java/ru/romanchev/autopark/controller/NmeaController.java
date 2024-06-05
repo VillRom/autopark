@@ -1,27 +1,50 @@
 package ru.romanchev.autopark.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.romanchev.autopark.service.Impl.NmeaServ;
+import ru.romanchev.autopark.model.PassedWay;
+import ru.romanchev.autopark.service.CalculateWay;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/nmea")
+@Slf4j
 public class NmeaController {
 
-    private final NmeaServ nmeaServ;
+    private final CalculateWay calculateWay;
 
-    @GetMapping
-    public void fileNmea(@RequestPart("file") MultipartFile file) throws IOException {
-        nmeaServ.readLogFile(file.getResource().getFile());//TODO 
-        Files.write(Path.of("src/main/resources/" + file.getOriginalFilename()), file.getBytes());
+    @GetMapping("/way")
+    public String fileNmea(@RequestPart("file") MultipartFile file, Model model) {
+        log.info("Get request to calculate the way");
+        String path = "src/main/resources/" + file.getOriginalFilename();
+        File nmea = new File(path);
+        if (nmea.isFile() && !nmea.isDirectory()) {
+            model.addAttribute("way", new PassedWay(calculateWay.calculateWay(nmea)));
+        }
+        else {
+            try {
+                Files.write(Path.of(path), file.getBytes());
+                model.addAttribute("way", new PassedWay(calculateWay.calculateWay(new File(path))));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return "nmea";
+    }
+
+    @GetMapping()
+    public String title() {
+        log.info("Get start page request");
+        return "title";
     }
 }
