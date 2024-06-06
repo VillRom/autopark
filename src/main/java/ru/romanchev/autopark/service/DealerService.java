@@ -8,7 +8,7 @@ public interface DealerService {
 
     DealerDto addOwnerToDealer(Long ownerId, Long dealerId);
 
-    void deleteOwnerFromDealer(Long ownerId, Long dealerId);
+    DealerDto deleteOwnerFromDealer(Long ownerId, Long dealerId);
 
     DealerDto getDealer(Long dealerId);
 }

@@ -9,11 +9,14 @@ import ru.romanchev.autopark.mapper.DealerMapper;
 import ru.romanchev.autopark.model.Dealer;
 import ru.romanchev.autopark.model.Owner;
 import ru.romanchev.autopark.model.dto.DealerDto;
+import ru.romanchev.autopark.model.dto.OwnerDto;
 import ru.romanchev.autopark.repository.DealerRepository;
 import ru.romanchev.autopark.repository.OwnerRepository;
 import ru.romanchev.autopark.service.DealerService;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +29,14 @@ public class DealerServiceImpl implements DealerService {
 
     @Override
     public DealerDto addDealer(DealerDto dealerDto) {
-        if (dealerRepository.existsById(dealerDto.getId())) {
-            log.info("Дилер {} уже существует", dealerDto);
-            throw new RequestException("The dealer with id = " + dealerDto.getId() + " already exists");
+        if (dealerDto.getOwners() != null) {
+            return DealerMapper.dealerToDto(dealerRepository.save(DealerMapper.dtoToDealer(dealerDto,
+                    ownerRepository.getOwnersByIdIsIn(dealerDto.getOwners()
+                            .stream()
+                            .map(OwnerDto::getId)
+                            .collect(Collectors.toSet())))));
         }
-        return DealerMapper.dealerToDto(dealerRepository.save(DealerMapper.dtoToDealer(dealerDto,
-                ownerRepository.getOwnersByIdIsIn(dealerDto.getOwnersId()))));
+        else return DealerMapper.dealerToDto(dealerRepository.save(DealerMapper.dtoToDealer(dealerDto, new HashSet<>())));
     }
 
     @Override
@@ -40,26 +45,29 @@ public class DealerServiceImpl implements DealerService {
                 -> new EntityNotFoundException("Owner with id = " + ownerId + " not found"));
         Dealer dealer = dealerRepository.findById(dealerId).orElseThrow(()
                 -> new EntityNotFoundException("Dealer with id = " + dealerId + " not found"));
-        if (dealer.getOwners().contains(owner)) throw new RuntimeException("The owner is " +
+        if (dealer.getOwners() != null && dealer.getOwners().contains(owner)) throw new RequestException("The owner is " +
                 "already being serviced by the dealer");
-        Set<Owner> owners = dealer.getOwners();
+        Set<Owner> owners = new HashSet<>();
+        if (dealer.getOwners() != null) {
+            owners = dealer.getOwners();
+        }
         owners.add(owner);
         dealer.setOwners(owners);
         return DealerMapper.dealerToDto(dealerRepository.save(dealer));
     }
 
     @Override
-    public void deleteOwnerFromDealer(Long ownerId, Long dealerId) {
+    public DealerDto deleteOwnerFromDealer(Long ownerId, Long dealerId) {
         Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException("Owner with id = " + ownerId + " not found"));
         Dealer dealer = dealerRepository.findById(dealerId).orElseThrow(()
                 -> new EntityNotFoundException("Dealer with id = " + dealerId + " not found"));
-        if (!dealer.getOwners().contains(owner)) throw new RuntimeException("The owner is not " +
+        if (!dealer.getOwners().contains(owner)) throw new RequestException("The owner is not " +
                 "serviced by the dealer");
         Set<Owner> owners = dealer.getOwners();
         owners.remove(owner);
         dealer.setOwners(owners);
-        dealerRepository.save(dealer);
+        return DealerMapper.dealerToDto(dealerRepository.save(dealer));
     }
 
     @Override

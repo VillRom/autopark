@@ -13,20 +13,21 @@ public class OwnerMapper {
     public static OwnerDto ownerToDto(Owner owner) {
         OwnerDto dto =new OwnerDto();
         dto.setId(owner.getId());
-        dto.setCarsId(owner.getCars().stream().map(Car::getId).collect(Collectors.toSet()));
+        if (owner.getCars() != null) dto.setCarsId(owner.getCars()
+                .stream()
+                .map(Car::getId)
+                .collect(Collectors.toSet()));
         dto.setEmail(owner.getEmail());
         dto.setPhone(owner.getPhone());
         dto.setFirstName(owner.getFirstName());
         dto.setLastName(owner.getLastName());
         dto.setMiddleName(owner.getMiddleName());
-        dto.setDealer_id(owner.getOwner().getId());
         return dto;
     }
 
-    public static Owner dtoToOwner(OwnerDto dto, Set<Car> cars) {
+    public static Owner dtoToOwner(OwnerDto dto) {
         Owner owner = new Owner();
         owner.setId(dto.getId());
-        owner.setCars(cars);
         owner.setEmail(dto.getEmail());
         owner.setPhone(dto.getPhone());
         owner.setFirstName(dto.getFirstName());

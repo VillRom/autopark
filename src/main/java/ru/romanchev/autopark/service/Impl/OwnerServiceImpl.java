@@ -6,11 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.romanchev.autopark.exception.RequestException;
 import ru.romanchev.autopark.mapper.OwnerMapper;
+import ru.romanchev.autopark.model.Car;
 import ru.romanchev.autopark.model.Owner;
 import ru.romanchev.autopark.model.dto.OwnerDto;
 import ru.romanchev.autopark.repository.CarRepository;
 import ru.romanchev.autopark.repository.OwnerRepository;
 import ru.romanchev.autopark.service.OwnerService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +27,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public OwnerDto addOwner(OwnerDto ownerDto) {
-        if (ownerRepository.existsById(ownerDto.getId())) {
-            log.info("Владелец {} уже существует", ownerDto);
-            throw new RequestException("The owner with id = " + ownerDto.getId() + " already exists");
-        }
-        return OwnerMapper.ownerToDto(ownerRepository.save(OwnerMapper.dtoToOwner(ownerDto,
-                carRepository.getCarsByIdIsIn(ownerDto.getCarsId()))));
+        return OwnerMapper.ownerToDto(ownerRepository.save(OwnerMapper.dtoToOwner(ownerDto)));
     }
 
     @Override
@@ -36,5 +35,37 @@ public class OwnerServiceImpl implements OwnerService {
         Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
                 -> new EntityNotFoundException("Owner with id = " + ownerId + " not found"));
         return OwnerMapper.ownerToDto(owner);
+    }
+
+    @Override
+    public OwnerDto addCarToOwner(Long carId, Long ownerId) {
+        Car car = carRepository.findById(carId).orElseThrow(()
+                -> new EntityNotFoundException("Car with id = " + carId + " not found"));
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
+                -> new EntityNotFoundException("Owner with id = " + carId + " not found"));
+        if (car.getOwner() != null) throw new RuntimeException("У машины уже есть владелец");
+        Set<Car> cars = new HashSet<>();
+        if (owner.getCars() != null) cars = owner.getCars();
+        cars.add(car);
+        owner.setCars(cars);
+        car.setOwner(owner);
+        carRepository.save(car);
+        return OwnerMapper.ownerToDto(ownerRepository.save(owner));
+    }
+
+    @Override
+    public OwnerDto deleteCarFromOwner(Long carId, Long ownerId) {
+        Car car = carRepository.findById(carId).orElseThrow(()
+                -> new EntityNotFoundException("Car with id = " + carId + " not found"));
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(()
+                -> new EntityNotFoundException("Owner with id = " + carId + " not found"));
+        if (owner.getCars() == null || !owner.getCars().contains(car)) throw new RequestException("Машина не закреплена " +
+                "за этим владельцем");
+        Set<Car> cars = owner.getCars();
+        cars.remove(car);
+        owner.setCars(cars);
+        car.setOwner(null);
+        carRepository.save(car);
+        return OwnerMapper.ownerToDto(ownerRepository.save(owner));
     }
 }

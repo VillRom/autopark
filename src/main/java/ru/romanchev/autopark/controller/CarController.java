@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.romanchev.autopark.model.dto.CarDto;
+import ru.romanchev.autopark.model.dto.CarFullInfoDto;
 import ru.romanchev.autopark.service.CarService;
 
 @RestController
@@ -19,28 +20,14 @@ public class CarController {
     }
 
     @GetMapping("/{carId}")
-    public CarDto getInfoAboutCar(@PathVariable Long carId) {
+    public CarFullInfoDto getInfoAboutCar(@PathVariable Long carId) {
         log.info("Get car with id = {}", carId);
         return carService.getCar(carId);
     }
 
     @PostMapping()
-    public void addCar(@RequestBody CarDto dto) {
+    public CarDto addCar(@RequestBody CarDto dto) {
         log.info("Add car");
-        carService.addCar(dto);
-    }
-
-    @PatchMapping("/{carId}")
-    public CarDto addCarToOwner(@PathVariable Long carId,
-                                  @RequestParam Long ownerId) {
-        log.info("Add car with id = {} to owner with id = {}", carId, ownerId);
-        return carService.addCarToOwner(carId, ownerId);
-    }
-
-    @DeleteMapping("/{carId}")
-    public void deleteCarFromOwner(@PathVariable Long carId,
-                                  @RequestParam Long ownerId) {
-        log.info("Delete car with id = {} from owner with id = {}", carId, ownerId);
-        carService.deleteCarFromOwner(carId, ownerId);
+        return carService.addCar(dto);
     }
 }

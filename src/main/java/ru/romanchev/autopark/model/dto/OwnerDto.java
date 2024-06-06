@@ -12,5 +12,4 @@ public class OwnerDto {
     private String phone;
     private String email;
     private Set<Long> carsId;
-    private Long dealer_id;
 }

@@ -28,10 +28,6 @@ public class Owner {
 
     private String email;
 
-    @Transient
+    @OneToMany
     private Set<Car> cars;
-
-    @ManyToOne
-    @JoinColumn(name = "dealer_id")
-    private Dealer owner;
 }

@@ -30,10 +30,10 @@ public class DealerController {
     }
 
     @DeleteMapping("/{dealerId}")
-    public void deleteOwnerFromDealer(@RequestParam Long ownerId,
-                                      @PathVariable Long dealerId) {
+    public DealerDto deleteOwnerFromDealer(@RequestParam Long ownerId,
+                                           @PathVariable Long dealerId) {
         log.info("Delete owner with id = {} from dealer with id = {}", ownerId, dealerId);
-        dealerService.deleteOwnerFromDealer(ownerId, dealerId);
+        return dealerService.deleteOwnerFromDealer(ownerId, dealerId);
     }
 
     @GetMapping("/{dealerId}")

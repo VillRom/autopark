@@ -1,13 +1,10 @@
 package ru.romanchev.autopark.service;
 
 import ru.romanchev.autopark.model.dto.CarDto;
+import ru.romanchev.autopark.model.dto.CarFullInfoDto;
 
 public interface CarService {
-    void addCar(CarDto car);
+    CarDto addCar(CarDto car);
 
-    CarDto addCarToOwner(Long carId, Long ownerId);
-
-    void deleteCarFromOwner(Long carId, Long ownerId);
-
-    CarDto getCar(Long carId);
+    CarFullInfoDto getCar(Long carId);
 }

@@ -1,6 +1,7 @@
 package ru.romanchev.autopark.model.dto;
 
 import lombok.Data;
+
 import java.util.Set;
 
 @Data
@@ -10,5 +11,5 @@ public class DealerDto {
     private String email;
     private String firstName;
     private String lastName;
-    private Set<Long> ownersId;
+    private Set<OwnerDto> owners;
 }

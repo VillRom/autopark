@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Table(name = "cars")
@@ -17,9 +17,9 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long number;
+    private Long uniqueNumber;
 
-    private LocalDate buildDate;
+    private Date buildDate;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

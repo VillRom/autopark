@@ -29,4 +29,18 @@ public class OwnerController {
         log.info("Get owner with id = {}", ownerId);
         return ownerService.getOwner(ownerId);
     }
+
+    @PatchMapping("/{ownerId}")
+    public OwnerDto addCarToOwner(@PathVariable Long ownerId,
+                                  @RequestParam Long carId) {
+        log.info("Add car with id = {} to owner with id = {}", carId, ownerId);
+        return ownerService.addCarToOwner(carId, ownerId);
+    }
+
+    @DeleteMapping("/{ownerId}")
+    public OwnerDto deleteCarFromOwner(@PathVariable Long ownerId,
+                                       @RequestParam Long carId) {
+        log.info("Delete car with id = {} from owner with id = {}", carId, ownerId);
+        return ownerService.deleteCarFromOwner(carId, ownerId);
+    }
 }

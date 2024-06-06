@@ -6,7 +6,6 @@ import ru.romanchev.autopark.model.Owner;
 import ru.romanchev.autopark.model.dto.DealerDto;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @UtilityClass
 public class DealerMapper {
@@ -28,7 +27,7 @@ public class DealerMapper {
         dto.setFirstName(dealer.getFirstName());
         dto.setLastName(dealer.getLastName());
         dto.setEmail(dealer.getEmail());
-        dto.setOwnersId(dealer.getOwners().stream().map(Owner::getId).collect(Collectors.toSet()));
+        if (dealer.getOwners() != null) dto.setOwners(OwnerMapper.ownersToDtos(dealer.getOwners()));
         return dto;
     }
 }

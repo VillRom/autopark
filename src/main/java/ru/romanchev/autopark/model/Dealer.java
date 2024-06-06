@@ -25,6 +25,6 @@ public class Dealer {
 
     private String lastName;
 
-    @Transient
+    @OneToMany
     private Set<Owner> owners;
 }

@@ -24,27 +24,21 @@ public class NmeaController {
     private final CalculateWay calculateWay;
 
     @GetMapping("/way")
-    public String fileNmea(@RequestPart("file") MultipartFile file, Model model) {
+    public String fileNmea(@RequestPart("file") MultipartFile fileToUpload, Model model) {
         log.info("Get request to calculate the way");
-        String path = "src/main/resources/" + file.getOriginalFilename();
+        String path = "src/main/resources/" + fileToUpload.getOriginalFilename();
         File nmea = new File(path);
         if (nmea.isFile() && !nmea.isDirectory()) {
             model.addAttribute("way", new PassedWay(calculateWay.calculateWay(nmea)));
         }
         else {
             try {
-                Files.write(Path.of(path), file.getBytes());
+                Files.write(Path.of(path), fileToUpload.getBytes());
                 model.addAttribute("way", new PassedWay(calculateWay.calculateWay(new File(path))));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return "nmea";
-    }
-
-    @GetMapping()
-    public String title() {
-        log.info("Get start page request");
-        return "title";
     }
 }
